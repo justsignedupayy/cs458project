@@ -1,0 +1,117 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Poppins:wght@700&display=swap');
+
+/* Background Video Styling */
+.login-container {
+    position: relative;
+    height: 100vh;
+    overflow: hidden;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+  
+.background-video {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    z-index: -1;
+}
+
+/* Login Card */
+.login-card {
+    background: rgba(0, 0, 0, 0.7); /* Semi-transparent dark background */
+    color: white;
+    padding: 40px;
+    border-radius: 10px;
+    text-align: center;
+    width: 350px;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+}
+
+/* Title - Modern and Bold */
+.login-card h1 {
+    font-family: "Poppins", sans-serif; /* Modern and stylish font */
+    font-size: 28px;
+    font-weight: 700; /* Bold */
+    color: #fff; /* White for contrast */
+    margin-bottom: 10px;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3); /* Subtle shadow */
+}
+
+/* Subtitle - Clean and Elegant */
+.login-card p {
+    font-family: "Inter", sans-serif; /* Sleek, readable font */
+    font-size: 16px;
+    font-weight: 400; /* Normal weight */
+    color: #ddd; /* Light gray for readability */
+    margin-bottom: 20px;
+}
+
+/* Error Message */
+.error-message {
+    color: #ff4d4d;
+    font-size: 14px;
+    margin-bottom: 10px;
+}
+
+/* Centering Everything Properly */
+.input-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center; /* Ensures inputs are aligned like buttons */
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+/* Input Fields */
+.input-field {
+    padding: 15px;
+    width: 100%; /* Ensures input width matches button width */
+    max-width: 400px; /* Keep input fields and buttons uniform */
+    font-size: 18px; /* Larger font for better readability */
+    border-radius: 8px; /* Softer corners */
+    border: none;
+    outline: none;
+    background: rgba(255, 255, 255, 0.2);
+    color: white;
+    transition: all 0.3s ease-in-out;
+    text-align: left;
+}
+
+.input-field::placeholder {
+    color: rgba(255, 255, 255, 0.7);
+}
+
+/* Buttons - Same Width as Input Fields */
+.login-button, .google-button {
+    padding: 15px; /* Increased padding to match input field height */
+    font-size: 18px;
+    cursor: pointer;
+    border: none;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+    width: 100%;
+    max-width: 300px; /* Match button width to input fields */
+}
+
+.login-button {
+    background-color: #4CAF50;
+    color: white;
+}
+
+.google-button {
+    background-color: #4285F4;
+    color: white;
+}
+
+/* Hover Effects */
+.login-button:hover {
+    background-color: #45a049;
+}
+
+.google-button:hover {
+    background-color: #357ae8;
+}

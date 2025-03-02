@@ -1,5 +1,7 @@
 import React, { useState } from "react";
 import { signInWithGoogle, signInWithEmail } from "./firebase-config";
+import { motion } from "framer-motion";
+import "./LoginPage.css"; // Import CSS for video styling
 
 function LoginPage() {
   const [email, setEmail] = useState("");
@@ -21,80 +23,70 @@ function LoginPage() {
   };
 
   return (
-    <div style={{ textAlign: "center", marginTop: "100px" }}>
-      <h1>Welcome to Our App</h1>
-      <p>Please sign in to continue.</p>
+    <div className="login-container">
+      {/* Video Background */}
+      <video autoPlay loop muted className="background-video">
+        <source src="macintosh.mp4" type="video/mp4" />
+        Your browser does not support the video tag.
+      </video>
 
-      {/* Display error message */}
-      {error && <p style={errorStyle}>{error}</p>}
+      {/* Login Card */}
+      <motion.div 
+        initial={{ opacity: 0, y: -20 }} 
+        animate={{ opacity: 1, y: 0 }} 
+        transition={{ duration: 0.6 }}
+        className="login-card"
+      >
+        <h1>Welcome to Our App</h1>
+        <p>Please sign in to continue.</p>
 
-      {/* Email & Password Login */}
-      <div style={inputContainerStyle}>
-        <input
-          type="email"
-          placeholder="Email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          style={inputStyle}
-        />
-        <input
-          type="password"
-          placeholder="Password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          style={inputStyle}
-        />
-        <button onClick={handleEmailLogin} style={buttonStyle}>Sign in with Email</button>
-      </div>
+        {/* Display error message */}
+        {error && <motion.p className="error-message" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+          {error}
+        </motion.p>}
 
-      {/* Google Login */}
-      <p>or</p>
-      <button onClick={signInWithGoogle} style={googleButtonStyle}>Sign in with Google</button>
+        {/* Email & Password Login */}
+        <div className="input-container">
+          <motion.input
+            type="email"
+            placeholder="Email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            className="input-field"
+            whileFocus={{ scale: 1.05 }}
+          />
+          <motion.input
+            type="password"
+            placeholder="Password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            className="input-field"
+            whileFocus={{ scale: 1.05 }}
+          />
+          <motion.button 
+            onClick={handleEmailLogin} 
+            className="login-button" 
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+          >
+            Sign in with Email
+          </motion.button>
+        </div>
+
+        <p>or</p>
+
+        {/* Google Login */}
+        <motion.button 
+          onClick={signInWithGoogle} 
+          className="google-button" 
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
+        >
+          Sign in with Google
+        </motion.button>
+      </motion.div>
     </div>
   );
 }
-
-// Styles
-const errorStyle = {
-  color: "red",
-  fontSize: "14px",
-  marginBottom: "10px"
-};
-
-const inputContainerStyle = {
-  display: "flex",
-  flexDirection: "column",
-  alignItems: "center",
-  gap: "10px",
-  marginBottom: "20px"
-};
-
-const inputStyle = {
-  padding: "10px",
-  width: "250px",
-  fontSize: "16px",
-  borderRadius: "5px",
-  border: "1px solid #ccc"
-};
-
-const buttonStyle = {
-  padding: "10px 20px",
-  fontSize: "16px",
-  cursor: "pointer",
-  backgroundColor: "#4CAF50",
-  color: "white",
-  border: "none",
-  borderRadius: "5px"
-};
-
-const googleButtonStyle = {
-  padding: "10px 20px",
-  fontSize: "16px",
-  cursor: "pointer",
-  backgroundColor: "#4285F4",
-  color: "white",
-  border: "none",
-  borderRadius: "5px"
-};
 
 export default LoginPage;
