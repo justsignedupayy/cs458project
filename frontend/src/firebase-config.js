@@ -44,7 +44,6 @@ export const signInWithGoogle = async () => {
   }
 };
 
-// Email/Password Sign-In with Detailed Error Handling
 export const signInWithEmail = async (email, password) => {
   try {
     if (!email || !password) {
@@ -57,24 +56,29 @@ export const signInWithEmail = async (email, password) => {
   } catch (error) {
     let errorMessage = "An unknown error occurred.";
 
-    switch (error.code) {
-      case "auth/user-not-found":
-        errorMessage = "No account found with this email.";
-        break;
-      case "auth/wrong-password":
-        errorMessage = "Incorrect password. Please try again.";
-        break;
-      case "auth/invalid-email":
-        errorMessage = "Invalid email format.";
-        break;
-      case "auth/too-many-requests":
-        errorMessage = "Too many failed attempts. Try again later.";
-        break;
-      case "auth/network-request-failed":
-        errorMessage = "Network error. Please check your connection.";
-        break;
-      default:
-        errorMessage = error.message;
+    // Check Firebase's raw error message
+    if (error.code === "auth/invalid-credential") {
+      errorMessage = "Invalid email or password. Please try again.";
+    } else {
+      switch (error.code) {
+        case "auth/user-not-found":
+          errorMessage = "No account found with this email.";
+          break;
+        case "auth/wrong-password":
+          errorMessage = "Incorrect password. Please try again.";
+          break;
+        case "auth/invalid-email":
+          errorMessage = "Invalid email format.";
+          break;
+        case "auth/too-many-requests":
+          errorMessage = "Too many failed attempts. Try again later.";
+          break;
+        case "auth/network-request-failed":
+          errorMessage = "Network error. Please check your connection.";
+          break;
+        default:
+          errorMessage = error.message;
+      }
     }
 
     console.error("Email/Password Sign-In Error:", errorMessage);
