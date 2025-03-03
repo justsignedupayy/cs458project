@@ -31,6 +31,14 @@ CS458-Project/
 │   │   │── LoginPage.js            # Login page implementation
 │   │── package.json               # React dependencies
 │
+│── tests/
+│   │── chromedriver.exe
+│   │── test_case_1.py        
+│   │── test_case_2.py
+│   │── test_case_3.py 
+│   │── test_case_4.py
+│   │── test_case_5.py
+│
 │── README.md                      # Project documentation
 ```
 
