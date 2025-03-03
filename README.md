@@ -31,18 +31,6 @@ CS458-Project/
 │   │   │── LoginPage.js            # Login page implementation
 │   │── package.json               # React dependencies
 │
-│── tests/
-│   │── selenium-tests/
-│   │   │── login_tests.py         # Selenium test scripts
-│   │── requirements.txt           # Dependencies for test automation
-│
-│── UML-Diagrams/
-│   │── activity-diagram.png       # Activity diagram for login process
-│   │── state-diagram.png          # State diagram for login state transitions
-│   │── use-case-diagram.png       # Use-case diagram for authentication
-│   │── sequence-diagram.png       # Sequence diagram for login flow
-│   │── class-diagram.png          # Class diagram for project structure
-│
 │── README.md                      # Project documentation
 ```
 
@@ -88,17 +76,6 @@ Ensure you have the following installed:
    npm start
    ```
 
-### Running Selenium Tests
-
-1. Install required Python dependencies:
-   ```sh
-   pip install -r tests/requirements.txt
-   ```
-2. Run test cases:
-   ```sh
-   python tests/selenium-tests/login_tests.py
-   ```
-
 ## Test Cases
 
 The following test cases were implemented:
@@ -117,7 +94,10 @@ The following test cases were implemented:
 
 ## Contribution
 
-- **[Your Name]** - Full-stack development & testing
+- **[Deniz Hayri Özay]** - Full-stack development & testing
+- **[Osman Baktır]** - Full-stack development & testing
+- **[Ege Safi]** - Full-stack development & testing
+- **[Gizem Gökçe Işık]** - Full-stack development & testing
 
 ## License
 
