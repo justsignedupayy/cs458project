@@ -1,7 +1,7 @@
 # CS 458 Project Part 1 
 This project involves  the implementation of a web-based login page that supports authentication via email and password, as well as third-party authentication using Firebase Authentication. Additionally, Selenium-based test automation has been implemented for validating the login functionalities.
 
-Features Implemented
+## Features Implemented
 
 User Login Form
 
@@ -13,13 +13,14 @@ Third-party Authentication
 
 Login with Google
 
-Frontend: React.js
+## Frontend: React.js
 
-Backend: Express.js
+## Backend: Express.js
 
-Authentication: Firebase Authentication
+## Authentication: Firebase Authentication
 
-Test Automation: Selenium WebDriver
+## Test Automation: Selenium WebDriver
+
 CS458-Project/
 │── backend/
 │   │── server.js                 # Express.js server
