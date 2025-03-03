@@ -13,20 +13,20 @@ Third-party Authentication
 
 Login with Google
 
-## Frontend: React.js
+ Frontend: React.js
 
-## Backend: Express.js
+ Backend: Express.js
 
-## Authentication: Firebase Authentication
+ Authentication: Firebase Authentication
 
-## Test Automation: Selenium WebDriver
+ Test Automation: Selenium WebDriver
 
 # Project Structure
 
 CS458-Project/
 │── backend/
-│   │── server.js                 # Express.js server
-│   │── firebase-config.js         # Firebase authentication configuration
+│   │── server.js                   # Express.js server__
+│   │── firebase-config.js         # Firebase authentication configuration__
 │
 │── frontend/
 │   │── src/
