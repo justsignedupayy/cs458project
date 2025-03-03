@@ -20,9 +20,9 @@ This project involves implementing a web-based login page that supports authenti
 
 ```
 CS458-Project/
-│── backend/
-│   │── server.js                 # Express.js server
-│   │── firebase-config.js         # Firebase authentication configuration
+│__ backend/
+│   │── server.js                   # Express.js server__
+│   │── firebase-config.js         # Firebase authentication configuration__
 │
 │── frontend/
 │   │── src/
