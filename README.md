@@ -24,7 +24,7 @@ Login with Google
 # Project Structure
 
 CS458-Project/
-│── backend/
+│__ backend/
 │   │── server.js                   # Express.js server__
 │   │── firebase-config.js         # Firebase authentication configuration__
 │
