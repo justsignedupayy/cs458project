@@ -22,6 +22,7 @@ Login with Google
 ## Test Automation: Selenium WebDriver
 
 # Project Structure
+
 CS458-Project/
 │── backend/
 │   │── server.js                 # Express.js server
@@ -47,6 +48,7 @@ CS458-Project/
 │   │── class-diagram.png          # Class diagram for project structure
 │
 │── README.md                      # Project documentation
+
 
 # Installation and Setup
 
