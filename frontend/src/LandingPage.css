@@ -1,0 +1,46 @@
+/* Landing Page - Full Screen Background */
+.landing-container {
+    position: relative;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: url("../public/meteor.gif") no-repeat center center/cover;
+    background-size: cover;
+}
+
+  
+  /* Card Styling */
+  .landing-card {
+    background: rgba(0, 0, 0, 0.7); /* Semi-transparent dark background */
+    color: white;
+    padding: 30px;
+    border-radius: 10px;
+    text-align: center;
+    width: 350px;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+  }
+  
+  /* User Profile Image */
+  .profile-image {
+    border-radius: 50%;
+    margin-top: 10px;
+  }
+  
+  /* Logout Button */
+  .logout-button {
+    padding: 12px 20px;
+    font-size: 16px;
+    cursor: pointer;
+    background-color: #ff3b30;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    margin-top: 20px;
+    transition: all 0.3s ease-in-out;
+  }
+  
+  .logout-button:hover {
+    background-color: #d32f2f;
+  }
+  
