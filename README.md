@@ -112,5 +112,3 @@ The following test cases were implemented:
 This project is for educational purposes and follows the guidelines set by the CS458 course at Bilkent University.
 
 ---
-
-For any issues or inquiries, contact **[Your Email]**.
