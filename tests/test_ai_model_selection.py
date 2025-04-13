@@ -23,8 +23,8 @@ class SurveyAppTest(unittest.TestCase):
         password_input = self.driver.find_element(MobileBy.XPATH, "//XCUIElementTypeSecureTextField[@placeholder='Password']")
         sign_in_button = self.driver.find_element(MobileBy.XPATH, "//XCUIElementTypeButton[@name='Sign in with Email']")
         
-        email_input.send_keys("denis@gmail.com")
-        password_input.send_keys("deniz123")
+        email_input.send_keys("osman@gmail.com")
+        password_input.send_keys("osman")
         sign_in_button.click()
 
         time.sleep(2)
