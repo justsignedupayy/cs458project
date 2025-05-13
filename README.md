@@ -1,4 +1,4 @@
-# CS458 Project Part 1 - Login Page Implementation and Test Automation
+# CS458 Project Part 1 - Login Page Implementation and Test Automation this version is redundant as final version is in branch version_1.0
 
 ## Project Overview
 
