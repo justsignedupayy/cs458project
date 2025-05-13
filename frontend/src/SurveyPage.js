@@ -1,13 +1,136 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
   getSurveys,
   addDoc,
   collection,
-  db
+  db,
+  deleteSurvey
 } from './firebaseConfig';
 import SurveyBuilder from './SurveyBuilder';
 
+const styles = {
+  container: {
+    maxWidth: '1000px',
+    margin: '2rem auto',
+    padding: '0 1rem',
+    fontFamily: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
+    position: 'relative',
+  },
+  header: {
+    color: '#2c3e50',
+    textAlign: 'center',
+    marginBottom: '2rem',
+  },
+  userInfo: {
+    backgroundColor: '#f8f9fa',
+    padding: '1rem',
+    borderRadius: '8px',
+    marginBottom: '2rem',
+    textAlign: 'center',
+  },
+  surveyGrid: {
+    display: 'grid',
+    gridTemplateColumns: 'repeat(auto-fill, minmax(250px, 1fr))',
+    gap: '1rem',
+    margin: '2rem 0',
+  },
+  surveyCard: {
+    backgroundColor: 'white',
+    borderRadius: '8px',
+    padding: '1.5rem',
+    boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+    cursor: 'pointer',
+    transition: 'transform 0.2s ease',
+    position: 'relative',
+  },
+  selectedSurvey: {
+    backgroundColor: 'white',
+    borderRadius: '8px',
+    padding: '2rem',
+    margin: '2rem 0',
+    boxShadow: '0 4px 6px rgba(0,0,0,0.1)',
+  },
+  questionCard: {
+    backgroundColor: '#fff',
+    borderRadius: '8px',
+    padding: '1.5rem',
+    margin: '1rem 0',
+    boxShadow: '0 2px 4px rgba(0,0,0,0.05)',
+  },
+  input: {
+    width: '100%',
+    padding: '0.8rem',
+    margin: '0.5rem 0',
+    border: '1px solid #ddd',
+    borderRadius: '4px',
+    fontSize: '1rem',
+  },
+  button: {
+    padding: '0.6rem 1.2rem',
+    margin: '0.5rem',
+    border: 'none',
+    borderRadius: '4px',
+    cursor: 'pointer',
+    transition: 'all 0.3s ease',
+  },
+  primaryButton: {
+    backgroundColor: '#3498db',
+    color: 'white',
+  },
+  errorMessage: {
+    color: '#e74c3c',
+    backgroundColor: '#f8d7da',
+    padding: '1rem',
+    borderRadius: '4px',
+    margin: '1rem 0',
+  },
+  loadingText: {
+    textAlign: 'center',
+    color: '#95a5a6',
+    fontSize: '1.2rem',
+  },
+  required: {
+    color: '#e74c3c',
+    marginLeft: '0.3rem',
+  },
+  slider: {
+    width: '100%',
+    margin: '1rem 0',
+  },
+  radioOption: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '0.5rem',
+    margin: '0.5rem 0',
+  },
+  dashboardButton: {
+    position: 'absolute',
+    top: '1rem',
+    left: '1rem',
+    padding: '0.6rem 1.2rem',
+    border: 'none',
+    borderRadius: '4px',
+    cursor: 'pointer',
+    backgroundColor: '#2c3e50',
+    color: 'white',
+  },
+  deleteButton: {
+    position: 'absolute',
+    top: '0.5rem',
+    right: '0.5rem',
+    backgroundColor: 'transparent',
+    border: 'none',
+    color: '#e74c3c',
+    cursor: 'pointer',
+    fontSize: '1.2rem',
+    padding: '0.2rem',
+  }
+};
+
+
 const SurveyPage = ({ user }) => {
+  const navigate = useNavigate();
   const [surveys, setSurveys] = useState([]);
   const [selectedSurvey, setSelectedSurvey] = useState(null);
   const [responses, setResponses] = useState({});
@@ -15,33 +138,20 @@ const SurveyPage = ({ user }) => {
   const [error, setError] = useState(null);
   const [submissionError, setSubmissionError] = useState(null);
 
-  // Fetch existing surveys
   useEffect(() => {
     const fetchSurveys = async () => {
       try {
         setLoading(true);
-
-        // Ensure user is authenticated
-        if (!user) {
-          throw new Error("User not authenticated");
-        }
-
-        const result = await getSurveys();
-
-        if (result.success) {
-          setSurveys(result.surveys);
-          setError(null);
-        } else {
-          setError(result.error);
-        }
+        if (!user) throw new Error("User not authenticated");
+        
+        const result = await getSurveys(user.uid);  // Pass user UID
+        result.success ? setSurveys(result.surveys) : setError(result.error);
       } catch (err) {
-        setError(err.message || 'Failed to fetch surveys');
-        console.error('Survey fetch error:', err);
+        setError(err.message);
       } finally {
         setLoading(false);
       }
     };
-
     fetchSurveys();
   }, [user]);
 
@@ -51,6 +161,19 @@ const SurveyPage = ({ user }) => {
       ...responses,
       [questionIndex]: value
     });
+  };
+
+  const handleDeleteSurvey = async (surveyId, e) => {
+    e.stopPropagation();
+    if (window.confirm('Are you sure you want to delete this survey?')) {
+      try {
+        await deleteSurvey(surveyId);
+        setSurveys(surveys.filter(s => s.id !== surveyId));
+        if (selectedSurvey?.id === surveyId) setSelectedSurvey(null);
+      } catch (error) {
+        setError('Failed to delete survey');
+      }
+    }
   };
 
   // Handle survey selection
@@ -172,58 +295,89 @@ const SurveyPage = ({ user }) => {
   };
 
   if (loading) {
-    return <div>Loading surveys...</div>;
+    return <div style={styles.loadingText}>Loading surveys...</div>;
   }
 
   if (error) {
     return (
-      <div className="error-container">
-        <h2>Error</h2>
-        <p>{error}</p>
-        <p>Please ensure you are logged in and have the necessary permissions.</p>
+      <div style={styles.container}>
+        <div style={styles.errorMessage}>
+          <h2>Error</h2>
+          <p>{error}</p>
+          <p>Please ensure you are logged in and have the necessary permissions.</p>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="survey-page">
-      <h1>Survey Management</h1>
+    <div style={styles.container}>
+      <h1 style={styles.header}>Survey Management</h1>
 
-      {/* User Information */}
-      <div className="user-info">
+      <div style={styles.userInfo}>
         <h2>Welcome, {user.displayName || user.email}</h2>
       </div>
 
-      {/* Survey Selection */}
-      <div className="survey-selection">
-        <h2>Available Surveys</h2>
-        {surveys.length === 0 ? (
-          <p>No surveys available. Create a new survey below!</p>
-        ) : (
-          surveys.map((survey) => (
-            <button
-              key={survey.id}
-              onClick={() => handleSelectSurvey(survey)}
-              className="survey-select-button"
-            >
-              {survey.title}
-            </button>
-          ))
-        )}
+      <div>
+        <h2 style={{ marginBottom: '1rem' }}>Available Surveys</h2>
+        <div style={styles.surveyGrid}>
+          {surveys.length === 0 ? (
+            <p style={{ textAlign: 'center' }}>No surveys available. Create a new survey below!</p>
+          ) : (
+            surveys.map((survey) => (
+              <div
+                key={survey.id}
+                style={{
+                  ...styles.surveyCard,
+                  border: selectedSurvey?.id === survey.id ? '2px solid #3498db' : 'none'
+                }}
+                onClick={() => handleSelectSurvey(survey)}
+              >
+                <button
+                  style={styles.deleteButton}
+                  onClick={(e) => handleDeleteSurvey(survey.id, e)}
+                  title="Delete survey"
+                >
+                  ×
+                </button>
+                <h3>{survey.title}</h3>
+                <p style={{ color: '#95a5a6' }}>
+                  {survey.questions.length} questions
+                </p>
+              </div>
+            ))
+          )}
+        </div>
       </div>
 
-      {/* Survey Builder Component */}
-      <SurveyBuilder />
+      <div style={{ margin: '3rem 0' }}>
+        <h2 style={{ marginBottom: '1rem' }}>Create New Survey</h2>
+        <SurveyBuilder 
+  user={user}
+  onSurveyCreated={() => {
+    // Refresh surveys after creation
+    getSurveys(user.uid).then(result => {
+      if (result.success) setSurveys(result.surveys);
+    });
+  }}
+/>
+      </div>
 
-      {/* Selected Survey Rendering */}
       {selectedSurvey && (
-        <div className="selected-survey">
-          <h2>Take Survey: {selectedSurvey.title}</h2>
+        <div style={styles.selectedSurvey}>
+          <h2 style={{ marginBottom: '1.5rem' }}>Take Survey: {selectedSurvey.title}</h2>
           {renderSurveyQuestions()}
-          {submissionError && <p className="error-message">{submissionError}</p>}
+          {submissionError && <div style={styles.errorMessage}>{submissionError}</div>}
           <button
             onClick={submitSurveyResponse}
-            className="submit-survey-button"
+            style={{
+              ...styles.button,
+              ...styles.primaryButton,
+              padding: '1rem 2rem',
+              fontSize: '1.1rem',
+              width: '100%',
+              marginTop: '2rem'
+            }}
           >
             Submit Survey
           </button>

@@ -1,7 +1,95 @@
 import React, { useState } from 'react';
 import { addSurvey } from './firebaseConfig';
 
-const SurveyBuilder = () => {
+const styles = {
+  container: {
+    maxWidth: '800px',
+    margin: '2rem auto',
+    padding: '0 1rem',
+    fontFamily: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
+  },
+  header: {
+    color: '#2c3e50',
+    textAlign: 'center',
+    marginBottom: '2rem',
+  },
+  input: {
+    width: '100%',
+    padding: '0.8rem',
+    margin: '0.5rem 0',
+    border: '1px solid #ddd',
+    borderRadius: '4px',
+    fontSize: '1rem',
+  },
+  button: {
+    padding: '0.6rem 1.2rem',
+    margin: '0.5rem',
+    border: 'none',
+    borderRadius: '4px',
+    cursor: 'pointer',
+    transition: 'all 0.3s ease',
+  },
+  primaryButton: {
+    backgroundColor: '#3498db',
+    color: 'white',
+    '&:hover': {
+      backgroundColor: '#2980b9',
+    },
+  },
+  secondaryButton: {
+    backgroundColor: '#95a5a6',
+    color: 'white',
+    '&:hover': {
+      backgroundColor: '#7f8c8d',
+    },
+  },
+  dangerButton: {
+    backgroundColor: '#e74c3c',
+    color: 'white',
+    '&:hover': {
+      backgroundColor: '#c0392b',
+    },
+  },
+  questionItem: {
+    backgroundColor: 'white',
+    borderRadius: '8px',
+    padding: '1.5rem',
+    margin: '1rem 0',
+    boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+  },
+  questionHeader: {
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: '1rem',
+  },
+  optionItem: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '0.5rem',
+    margin: '0.5rem 0',
+  },
+  errorMessage: {
+    color: '#e74c3c',
+    backgroundColor: '#f8d7da',
+    padding: '1rem',
+    borderRadius: '4px',
+    margin: '1rem 0',
+  },
+  configSection: {
+    margin: '1rem 0',
+    padding: '1rem',
+    backgroundColor: '#f8f9fa',
+    borderRadius: '4px',
+  },
+  label: {
+    display: 'block',
+    margin: '0.5rem 0',
+    fontWeight: '500',
+  },
+};
+
+const SurveyBuilder = ({ user, onSurveyCreated }) => {
   const [questions, setQuestions] = useState([]);
   const [validationError, setValidationError] = useState(null);
   const [surveyTitle, setSurveyTitle] = useState('');
@@ -34,6 +122,26 @@ const SurveyBuilder = () => {
       text: '',
       condition: null,
       dependsOn: null,
+      required: false
+    };
+    setQuestions([...questions, newQuestion]);
+  };
+
+  const addDropdownQuestion = () => {
+    const newQuestion = {
+      type: 'dropdown',
+      text: '',
+      options: ['', ''],
+      required: false
+    };
+    setQuestions([...questions, newQuestion]);
+  };
+
+  const addCheckboxQuestion = () => {
+    const newQuestion = {
+      type: 'checkbox',
+      text: '',
+      options: ['', ''],
       required: false
     };
     setQuestions([...questions, newQuestion]);
@@ -116,72 +224,101 @@ const SurveyBuilder = () => {
     return true;
   };
 
+  // In SurveyBuilder.js - Modified submit function
   const submitSurvey = async () => {
     if (!validateSurvey()) return;
 
     try {
-      const result = await addSurvey({
-        title: surveyTitle,
-        questions,
-      });
+      const surveyData = {
+        title: surveyTitle.trim(),
+        questions: questions.map(q => ({
+          ...q,
+          text: q.text.trim(),
+          ...(q.type === 'conditional' && {
+            dependsOn: q.dependsOn?.trim() || '',
+            condition: q.condition?.trim() || ''
+          })
+        })),
+        createdAt: new Date(),
+        createdBy: user.uid
+      };
+
+      const result = await addSurvey(surveyData, user.uid);
 
       if (result.success) {
-        // Reset form after successful submission
         setQuestions([]);
         setSurveyTitle('');
         setValidationError(null);
         alert('Survey created successfully!');
+        
+        // Refresh parent survey list
+        if (onSurveyCreated) {
+          onSurveyCreated();
+        }
       } else {
-        setValidationError(result.error);
+        setValidationError(result.error || 'Failed to create survey');
       }
     } catch (error) {
-      console.error('Error submitting survey:', error);
-      setValidationError('Failed to submit survey');
+      console.error('Submission error:', error);
+      setValidationError(error.message || 'Failed to submit survey');
     }
   };
 
   return (
-    <div className="survey-builder">
-      <h2>Create New Survey</h2>
-
+    <div style={styles.container}>
       {/* Survey Title Input */}
       <input
         type="text"
         placeholder="Enter Survey Title"
         value={surveyTitle}
         onChange={(e) => setSurveyTitle(e.target.value)}
-        className="survey-title-input"
+        style={styles.input}
       />
 
       {/* Question Type Buttons */}
-      <div className="question-type-buttons">
+      <div style={{ display: 'flex', justifyContent: 'center', gap: '0.5rem', flexWrap: 'wrap' }}>
         <button
-          data-testid="add-multiple-choice"
           onClick={addMultipleChoiceQuestion}
+          style={{ ...styles.button, ...styles.primaryButton }}
         >
           Add Multiple Choice
         </button>
         <button
-          data-testid="add-rating-scale"
           onClick={addRatingScaleQuestion}
+          style={{ ...styles.button, ...styles.secondaryButton }}
         >
           Add Rating Scale
         </button>
         <button
-          data-testid="add-conditional-question"
-          onClick={addConditionalQuestion}
+          onClick={addDropdownQuestion}
+          style={{ ...styles.button, ...styles.secondaryButton }}
         >
-          Add Conditional Question
+          Add Dropdown
+        </button>
+        <button
+          onClick={addCheckboxQuestion}
+          style={{ ...styles.button, ...styles.secondaryButton }}
+        >
+          Add Checkbox
+        </button>
+        <button
+          onClick={addConditionalQuestion}
+          style={{ ...styles.button, ...styles.secondaryButton }}
+        >
+          Add Conditional
         </button>
       </div>
 
       {/* Questions List */}
-      <div className="questions-list">
+      <div>
         {questions.map((question, index) => (
-          <div key={index} className="question-item">
-            <div className="question-header">
-              <h3>Question {index + 1} ({question.type})</h3>
-              <button onClick={() => removeQuestion(index)} className="remove-question-button">
+          <div key={index} style={styles.questionItem}>
+            <div style={styles.questionHeader}>
+              <h3>Question {index + 1} ({question.type.replace('-', ' ')})</h3>
+              <button 
+                onClick={() => removeQuestion(index)}
+                style={{ ...styles.button, ...styles.dangerButton }}
+              >
                 Remove
               </button>
             </div>
@@ -191,94 +328,121 @@ const SurveyBuilder = () => {
               placeholder="Enter question text"
               value={question.text}
               onChange={(e) => updateQuestion(index, { text: e.target.value })}
-              className="question-text-input"
+              style={styles.input}
             />
 
-            <div className="question-details">
-              {question.type === 'multiple-choice' && (
-                <div className="multiple-choice-options">
-                  <h4>Options:</h4>
+            <div style={styles.configSection}>
+              {(question.type === 'multiple-choice' || 
+                question.type === 'dropdown' || 
+                question.type === 'checkbox') && (
+                <div>
+                  <h4>{question.type === 'checkbox' ? 'Checkbox Options' : 'Options'}</h4>
                   {question.options.map((option, optionIndex) => (
-                    <div key={optionIndex} className="option-item">
+                    <div key={optionIndex} style={styles.optionItem}>
                       <input
                         type="text"
                         placeholder={`Option ${optionIndex + 1}`}
                         value={option}
                         onChange={(e) => updateQuestionOption(index, optionIndex, e.target.value)}
+                        style={{ ...styles.input, flex: 1, margin: 0 }}
                       />
                       {question.options.length > 2 && (
-                        <button onClick={() => removeQuestionOption(index, optionIndex)} className="remove-option-button">
-                          Remove
+                        <button 
+                          onClick={() => removeQuestionOption(index, optionIndex)}
+                          style={{ ...styles.button, ...styles.dangerButton, padding: '0.3rem 0.6rem' }}
+                        >
+                          ×
                         </button>
                       )}
                     </div>
                   ))}
-                  <button onClick={() => addQuestionOption(index)} className="add-option-button">
-                    Add Option
+                  <button 
+                    onClick={() => addQuestionOption(index)}
+                    style={{ ...styles.button, ...styles.secondaryButton, marginTop: '0.5rem' }}
+                  >
+                    + Add Option
                   </button>
                 </div>
               )}
 
               {question.type === 'rating-scale' && (
-                <div className="rating-scale-config">
-                  <label>
-                    Min Value:
+                <div style={{ display: 'flex', gap: '1rem' }}>
+                  <div>
+                    <label style={styles.label}>Min Value:</label>
                     <input
                       type="number"
                       value={question.min}
                       onChange={(e) => updateQuestion(index, { min: parseInt(e.target.value) })}
+                      style={styles.input}
                     />
-                  </label>
-                  <label>
-                    Max Value:
+                  </div>
+                  <div>
+                    <label style={styles.label}>Max Value:</label>
                     <input
                       type="number"
                       value={question.max}
                       onChange={(e) => updateQuestion(index, { max: parseInt(e.target.value) })}
+                      style={styles.input}
                     />
-                  </label>
+                  </div>
                 </div>
               )}
 
               {question.type === 'conditional' && (
-                <div className="conditional-config">
-                  <label>
-                    Depends On Question:
+                <div>
+                  <div style={{ marginBottom: '1rem' }}>
+                    <label style={styles.label}>Depends On Question:</label>
                     <input
                       type="text"
                       placeholder="Enter the text of the question this depends on"
                       value={question.dependsOn}
                       onChange={(e) => updateConditionalQuestionDependency(index, e.target.value)}
+                      style={styles.input}
                     />
-                  </label>
-                  <label>
-                    Condition:
+                  </div>
+                  <div>
+                    <label style={styles.label}>Condition:</label>
                     <input
                       type="text"
                       placeholder="Enter the required answer for the above question"
                       value={question.condition}
                       onChange={(e) => updateConditionalQuestionCondition(index, e.target.value)}
+                      style={styles.input}
                     />
-                  </label>
+                  </div>
                 </div>
               )}
 
-              <label className="required-checkbox">
+              <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginTop: '1rem' }}>
                 <input
                   type="checkbox"
                   checked={question.required}
                   onChange={(e) => updateQuestion(index, { required: e.target.checked })}
                 />
-                Required
+                Required Question
               </label>
             </div>
           </div>
         ))}
       </div>
 
-      {validationError && <p className="error-message">{validationError}</p>}
+      {validationError && (
+        <div style={styles.errorMessage}>
+          {validationError}
+        </div>
+      )}
 
-      <button onClick={submitSurvey} className="submit-survey-button">
+      <button 
+        onClick={submitSurvey}
+        style={{ 
+          ...styles.button, 
+          ...styles.primaryButton,
+          width: '100%',
+          padding: '1rem',
+          fontSize: '1.1rem',
+          marginTop: '2rem'
+        }}
+      >
         Save Survey
       </button>
     </div>
@@ -286,4 +450,3 @@ const SurveyBuilder = () => {
 };
 
 export default SurveyBuilder;
-

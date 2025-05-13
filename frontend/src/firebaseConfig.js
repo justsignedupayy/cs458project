@@ -12,7 +12,9 @@ import {
   addDoc,
   query,
   getDocs,
-  where
+  where,
+  doc,
+  deleteDoc  // Added deleteDoc import
 } from 'firebase/firestore';
 
 // Your Firebase configuration object
@@ -102,11 +104,10 @@ const resetPassword = async (email) => {
   }
 };
 
-// Survey-related functions
-const getSurveys = async () => {
+const getSurveys = async (userId) => {  // Add userId parameter
   try {
     const surveysRef = collection(db, 'surveys');
-    const q = query(surveysRef);
+    const q = query(surveysRef, where('userId', '==', userId)); // Add where clause
     const querySnapshot = await getDocs(q);
 
     const surveys = querySnapshot.docs.map(doc => ({
@@ -114,9 +115,21 @@ const getSurveys = async () => {
       ...doc.data()
     }));
 
+    return { success: true, surveys };
+  } catch (error) {
+    return { success: false, error: error.message };
+  }
+};
+
+const addSurvey = async (surveyData, userId) => {
+  try {
+    const docRef = await addDoc(collection(db, 'surveys'), {
+      ...surveyData,
+      userId  // Add userId field to document
+    });
     return {
       success: true,
-      surveys
+      id: docRef.id
     };
   } catch (error) {
     return {
@@ -126,13 +139,11 @@ const getSurveys = async () => {
   }
 };
 
-const addSurvey = async (surveyData) => {
+// Added deleteSurvey function
+const deleteSurvey = async (surveyId) => {
   try {
-    const docRef = await addDoc(collection(db, 'surveys'), surveyData);
-    return {
-      success: true,
-      id: docRef.id
-    };
+    await deleteDoc(doc(db, 'surveys', surveyId));
+    return { success: true };
   } catch (error) {
     return {
       success: false,
@@ -150,6 +161,7 @@ export {
   resetPassword,
   getSurveys,
   addSurvey,
+  deleteSurvey,  // Added to exports
   collection,
   addDoc
 };

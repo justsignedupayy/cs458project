@@ -35,14 +35,28 @@ function LandingPage({ user }) {
       case 'surveys':
         return (
           <div className="survey-container">
-            <button 
-              onClick={() => setActivePage('dashboard')} 
-              className="back-button"
-            >
-              Back to Dashboard
-            </button>
-            <SurveyPage user={user} />
-          </div>
+  <button 
+    onClick={() => setActivePage('dashboard')} 
+    style={{
+      backgroundColor: '#2c3e50',
+      color: 'white',
+      padding: '0.6rem 1.2rem',
+      borderRadius: '4px',
+      border: 'none',
+      cursor: 'pointer',
+      transition: 'all 0.3s ease',
+      margin: '1rem 0',
+      fontSize: '1rem',
+      display: 'inline-block',
+      ':hover': {
+        backgroundColor: '#34495e'
+      }
+    }}
+  >
+    ← Back to Dashboard
+  </button>
+  <SurveyPage user={user} />
+</div>
         );
       default:
         return null;
