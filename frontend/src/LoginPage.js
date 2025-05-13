@@ -16,6 +16,17 @@ function LoginPage() {
       return;
     }
 
+    if (email.length > 255 || password.length > 255) {
+      setError("Input too long.");
+      return;
+    }
+
+    const sqlInjectionPattern = /([';]|--)/;
+    if (sqlInjectionPattern.test(email) || sqlInjectionPattern.test(password)) {
+      setError("Invalid input detected. Please avoid using special characters.");
+      return;
+    }
+
     const response = await signInWithEmail(email, password);
     if (!response.success) {
       setError(response.error); // Show detailed error message

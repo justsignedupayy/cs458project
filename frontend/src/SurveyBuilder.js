@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import { addSurvey } from './firebaseConfig';
+ import { addSurvey } from './firebaseConfig';
 
-const styles = {
+ const styles = {
   container: {
     maxWidth: '800px',
     margin: '2rem auto',
@@ -50,6 +50,12 @@ const styles = {
       backgroundColor: '#c0392b',
     },
   },
+  questionListContainer: { // New style for scrollable area
+    maxHeight: '400px',
+    overflowY: 'auto',
+    marginBottom: '1rem',
+    paddingRight: '0.5rem',
+  },
   questionItem: {
     backgroundColor: 'white',
     borderRadius: '8px',
@@ -87,9 +93,21 @@ const styles = {
     margin: '0.5rem 0',
     fontWeight: '500',
   },
-};
+  '@media (max-width: 600px)': { // Media query for mobile
+    container: {
+      padding: '0 0.5rem',
+    },
+    questionItem: {
+      padding: '1rem',
+    },
+    button: {
+      padding: '0.4rem 0.8rem',
+      margin: '0.3rem',
+    },
+  },
+ };
 
-const SurveyBuilder = ({ user, onSurveyCreated }) => {
+ const SurveyBuilder = ({ user, onSurveyCreated }) => {
   const [questions, setQuestions] = useState([]);
   const [validationError, setValidationError] = useState(null);
   const [surveyTitle, setSurveyTitle] = useState('');
@@ -147,13 +165,20 @@ const SurveyBuilder = ({ user, onSurveyCreated }) => {
     setQuestions([...questions, newQuestion]);
   };
 
+  const addOpenTextQuestion = () => {
+    const newQuestion = {
+      type: 'open-text',
+      text: '',
+      required: false
+    };
+    setQuestions([...questions, newQuestion]);
+  };
+
   const updateQuestion = (index, updates) => {
     const updatedQuestions = [...questions];
     updatedQuestions[index] = { ...updatedQuestions[index], ...updates };
     setQuestions(updatedQuestions);
   };
-
-  // --- Missing Functions Start ---
 
   const removeQuestion = (indexToRemove) => {
     const updatedQuestions = questions.filter((_, index) => index !== indexToRemove);
@@ -202,10 +227,7 @@ const SurveyBuilder = ({ user, onSurveyCreated }) => {
     }
   };
 
-  // --- Missing Functions End ---
-
   const validateSurvey = () => {
-    // Basic validation
     if (!surveyTitle.trim()) {
       setValidationError('Survey must have a title');
       return false;
@@ -224,7 +246,6 @@ const SurveyBuilder = ({ user, onSurveyCreated }) => {
     return true;
   };
 
-  // In SurveyBuilder.js - Modified submit function
   const submitSurvey = async () => {
     if (!validateSurvey()) return;
 
@@ -251,7 +272,6 @@ const SurveyBuilder = ({ user, onSurveyCreated }) => {
         setValidationError(null);
         alert('Survey created successfully!');
         
-        // Refresh parent survey list
         if (onSurveyCreated) {
           onSurveyCreated();
         }
@@ -307,10 +327,16 @@ const SurveyBuilder = ({ user, onSurveyCreated }) => {
         >
           Add Conditional
         </button>
+        <button
+          onClick={addOpenTextQuestion}
+          style={{ ...styles.button, ...styles.secondaryButton }}
+        >
+          Add Open Text
+        </button>
       </div>
 
-      {/* Questions List */}
-      <div>
+      {/* Scrollable Question List */}
+      <div style={styles.questionListContainer}>
         {questions.map((question, index) => (
           <div key={index} style={styles.questionItem}>
             <div style={styles.questionHeader}>
@@ -440,13 +466,13 @@ const SurveyBuilder = ({ user, onSurveyCreated }) => {
           width: '100%',
           padding: '1rem',
           fontSize: '1.1rem',
-          marginTop: '2rem'
+          marginTop: '1rem' // Adjusted margin
         }}
       >
         Save Survey
       </button>
     </div>
   );
-};
+ };
 
-export default SurveyBuilder;
+ export default SurveyBuilder;

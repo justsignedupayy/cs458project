@@ -104,6 +104,12 @@ const styles = {
     gap: '0.5rem',
     margin: '0.5rem 0',
   },
+    checkboxOption: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '0.5rem',
+    margin: '0.5rem 0',
+  },
   dashboardButton: {
     position: 'absolute',
     top: '1rem',
@@ -163,6 +169,22 @@ const SurveyPage = ({ user }) => {
     });
   };
 
+    const handleCheckboxResponseChange = (questionIndex, option, isChecked) => {
+    const currentResponses = responses[questionIndex] || [];
+    let updatedResponses;
+
+    if (isChecked) {
+      updatedResponses = [...currentResponses, option];
+    } else {
+      updatedResponses = currentResponses.filter(item => item !== option);
+    }
+
+    setResponses({
+      ...responses,
+      [questionIndex]: updatedResponses
+    });
+  };
+
   const handleDeleteSurvey = async (surveyId, e) => {
     e.stopPropagation();
     if (window.confirm('Are you sure you want to delete this survey?')) {
@@ -194,7 +216,7 @@ const SurveyPage = ({ user }) => {
             <div key={index} className="survey-question">
               <p>{question.text} {question.required && <span className="required">*</span>}</p>
               {question.options.map((option, optIndex) => (
-                <label key={optIndex}>
+                <label key={optIndex} style={styles.radioOption}>
                   <input
                     type="radio"
                     name={`question-${index}`}
@@ -220,6 +242,7 @@ const SurveyPage = ({ user }) => {
                 value={responses[index] || question.min || 1}
                 onChange={(e) => handleResponseChange(index, e.target.value)}
                 required={question.required}
+                style={styles.slider}
               />
               <span>Rating: {responses[index] || question.min || 1}</span>
             </div>
@@ -240,9 +263,62 @@ const SurveyPage = ({ user }) => {
                 value={responses[index] || ''}
                 onChange={(e) => handleResponseChange(index, e.target.value)}
                 required={question.required}
+                style={styles.input}
               />
             </div>
           );
+
+          case 'open-text':
+            return (
+              <div key={index} className="survey-question">
+                <p>{question.text} {question.required && <span className="required">*</span>}</p>
+                <textarea
+                  value={responses[index] || ''}
+                  onChange={(e) => handleResponseChange(index, e.target.value)}
+                  required={question.required}
+                  style={{ ...styles.input, resize: 'vertical' }}
+                />
+              </div>
+            );
+
+        case 'dropdown':
+          return (
+            <div key={index} className="survey-question">
+              <p>{question.text} {question.required && <span className="required">*</span>}</p>
+              <select
+                value={responses[index] || ''}
+                onChange={(e) => handleResponseChange(index, e.target.value)}
+                required={question.required}
+                style={styles.input}
+              >
+                <option value="" disabled>Select an option</option>
+                {question.options.map((option, optIndex) => (
+                  <option key={optIndex} value={option}>{option}</option>
+                ))}
+              </select>
+            </div>
+          );
+
+          case 'checkbox':
+            return (
+              <div key={index} className="survey-question">
+                <p>{question.text} {question.required && <span className="required">*</span>}</p>
+                {question.options.map((option, optIndex) => (
+                  <label key={optIndex} style={styles.checkboxOption}>
+                    <input
+                      type="checkbox"
+                      name={`question-${index}-option-${optIndex}`}
+                      value={option}
+                      checked={responses[index]?.includes(option) || false}
+                      onChange={(e) => handleCheckboxResponseChange(index, option, e.target.checked)}
+                      required={question.required}
+                    />
+                    {option}
+                  </label>
+                ))}
+              </div>
+            );
+
 
         default:
           return null;
@@ -261,6 +337,9 @@ const SurveyPage = ({ user }) => {
     const requiredQuestions = selectedSurvey.questions.filter(q => q.required);
     const allRequiredAnswered = requiredQuestions.every((question, index) => {
       const responseKey = selectedSurvey.questions.findIndex(q => q === question);
+      if (question.type === 'checkbox') {
+        return responses.hasOwnProperty(responseKey) && responses[responseKey] && responses[responseKey].length > 0;
+      }
       return responses.hasOwnProperty(responseKey) && responses[responseKey] !== undefined && responses[responseKey] !== '';
     });
 

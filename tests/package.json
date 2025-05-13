@@ -1,0 +1,9 @@
+{
+  "devDependencies": {
+    "@testing-library/react-native": "^13.2.0"
+  },
+  "dependencies": {
+    "expo": "^53.0.9",
+    "react-native-web": "^0.20.0"
+  }
+}
