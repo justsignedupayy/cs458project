@@ -1,4 +1,4 @@
-# CS458 Project Part 1 - Login Page Implementation and Test Automation
+# CS458 Project Part 3 - Login Page Implementation and Test Automation
 
 ## Project Overview
 
